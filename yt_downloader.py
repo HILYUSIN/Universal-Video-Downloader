@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, filedialog, scrolledtext, messagebox
 import threading
 import os
+import subprocess
+import shutil
 from pathlib import Path
 import queue
 from datetime import datetime
@@ -10,6 +12,53 @@ try:
     from yt_dlp import YoutubeDL
 except ImportError:
     pass  # Will be installed via requirements.txt
+
+def check_ffmpeg():
+    """Check if FFmpeg is available"""
+    # Check in current directory
+    local_ffmpeg = Path(__file__).parent / "ffmpeg.exe"
+    if local_ffmpeg.exists():
+        return str(local_ffmpeg)
+    
+    # Check in system PATH
+    ffmpeg_path = shutil.which("ffmpeg")
+    if ffmpeg_path:
+        return ffmpeg_path
+    
+    return None
+
+def offer_ffmpeg_install():
+    """Offer to install FFmpeg if not found"""
+    response = messagebox.askyesno(
+        "FFmpeg Tidak Ditemukan",
+        "FFmpeg diperlukan untuk download audio/musik (MP3).\n\n"
+        "Apakah Anda ingin menginstall FFmpeg sekarang?\n"
+        "(Auto-installer akan mendownload ~80MB)\n\n"
+        "Klik 'No' jika hanya ingin download video."
+    )
+    
+    if response:
+        try:
+            # Run install_ffmpeg.py
+            install_script = Path(__file__).parent / "install_ffmpeg.py"
+            if install_script.exists():
+                subprocess.Popen([
+                    'python', str(install_script)
+                ], creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0)
+                
+                messagebox.showinfo(
+                    "Installer Dibuka",
+                    "Installer FFmpeg telah dibuka di window terpisah.\n\n"
+                    "Setelah selesai, restart aplikasi untuk menggunakan fitur MP3."
+                )
+            else:
+                messagebox.showerror(
+                    "Error",
+                    "File install_ffmpeg.py tidak ditemukan.\n"
+                    "Download manual dari: https://ffmpeg.org/"
+                )
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal menjalankan installer: {e}")
 
 class UniversalDownloader:
     def __init__(self, root):
@@ -24,12 +73,17 @@ class UniversalDownloader:
         self.urls_queue = []
         self.is_downloading = False
         self.log_queue = queue.Queue()
+        self.ffmpeg_available = check_ffmpeg() is not None
         
         # Setup UI
         self.setup_ui()
         
         # Start log updater
         self.update_logs()
+        
+        # Check FFmpeg on startup
+        if not self.ffmpeg_available:
+            self.root.after(1000, self.check_ffmpeg_status)
         
     def setup_ui(self):
         # Main container with padding
@@ -164,6 +218,17 @@ class UniversalDownloader:
         except queue.Empty:
             pass
         self.root.after(100, self.update_logs)
+    
+    def check_ffmpeg_status(self):
+        """Check FFmpeg and offer installation if not found"""
+        if self.download_type.get() == "audio":
+            # User selected audio but FFmpeg not available
+            offer_ffmpeg_install()
+        else:
+            # Just log that FFmpeg is not available
+            self.log("⚠️  FFmpeg tidak ditemukan - Download MP3 tidak tersedia")
+            self.log("    Download video masih bisa digunakan")
+            self.log("    Untuk MP3: Jalankan 'python install_ffmpeg.py'")
     
     def start_download(self):
         if self.is_downloading:
