@@ -14,31 +14,9 @@
 
 ---
 
-## 📸 Screenshot
+## INI DIA TAMPILAN APLIKASINYA
+<img width="1366" height="716" alt="image" src="https://github.com/user-attachments/assets/a7fd5a84-89cf-49bb-8e3f-8fe29547e73f" />
 
-```
-┌─────────────────────────────────────────────────┐
-│  Universal Video Downloader                     │
-│  ✓ YouTube  ✓ Instagram  ✓ TikTok  ✓ Facebook  │
-├─────────────────────────────────────────────────┤
-│  📥 Tipe Download:  ⚪ Video (MP4)  ⚪ Audio    │
-│                                                  │
-│  🔗 URL Video (Semua Platform):                │
-│  ┌─────────────────────────────────────────┐   │
-│  │ Paste link di sini...                   │   │
-│  │                                          │   │
-│  └─────────────────────────────────────────┘   │
-│                                                  │
-│  📁 Lokasi: C:\Users\...\Downloads  [Browse]   │
-│                                                  │
-│  [📥 Download] [🗑 Clear URLs] [🗑 Clear Logs]  │
-│                                                  │
-│  📊 Progress: ████████████░░░░ 75%             │
-│  ⏱ Log Console: Downloading... 5.2MB/s         │
-└─────────────────────────────────────────────────┘
-```
-
----
 
 ## ✨ Fitur Utama
 
